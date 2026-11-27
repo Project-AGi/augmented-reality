@@ -10,21 +10,23 @@ using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 using TouchPhase = UnityEngine.InputSystem.TouchPhase;
 using VRM;
 
-namespace Aiva.GraceAR
+namespace Aiva.AivaAR
 {
-    public sealed class GraceArApp : MonoBehaviour
+    public sealed class AivaArApp : MonoBehaviour
     {
         private static readonly List<ARRaycastHit> Hits = new();
         private static readonly BlendShapeKey Mouth = BlendShapeKey.CreateFromPreset(BlendShapePreset.A);
 
+        private InputAction _positionAction;
+        private InputAction _rotationAction;
         private ARRaycastManager _raycastManager;
         private ARPlaneManager _planeManager;
         private ARAnchorManager _anchorManager;
         private ARAnchor _anchor;
         private bool _placing;
-        private GraceChamber _chamber;
-        private GraceVrmLoader _loader;
-        private GraceReplyStream _replies;
+        private AivaChamber _chamber;
+        private AivaVrmLoader _loader;
+        private AivaReplyStream _replies;
         private VRMBlendShapeProxy _face;
         private TouchScreenKeyboard _addressKeyboard;
         private string _telepathyAddress = "";
@@ -40,18 +42,18 @@ namespace Aiva.GraceAR
         {
             EnhancedTouchSupport.Enable();
             CreateArRig();
-            _chamber = GraceChamber.Create();
+            _chamber = AivaChamber.Create();
             _chamber.gameObject.SetActive(false);
-            _replies = gameObject.AddComponent<GraceReplyStream>();
+            _replies = gameObject.AddComponent<AivaReplyStream>();
             _replies.TextArrived += AnimateReply;
             _replies.ReplyInterrupted += StopReplyAnimation;
 
-            _loader = gameObject.AddComponent<GraceVrmLoader>();
+            _loader = gameObject.AddComponent<AivaVrmLoader>();
             _loader.Loaded += model =>
             {
                 _chamber.Actions.Bind(model);
                 _face = model.GetComponent<VRMBlendShapeProxy>();
-                _status = "Grace is ready. Tap a floor point to place her chamber.";
+                _status = "AIVA is ready. Tap a floor point to place her chamber.";
             };
             _loader.Failed += error => _status = error;
             _loader.LoadInto(_chamber.ModelMount);
@@ -80,12 +82,12 @@ namespace Aiva.GraceAR
             camera.backgroundColor = Color.black;
             cameraObject.AddComponent<AudioListener>();
             var poseDriver = cameraObject.AddComponent<TrackedPoseDriver>();
-            var positionAction = new InputAction("AR camera position", InputActionType.Value, "<XRHMD>/centerEyePosition");
-            var rotationAction = new InputAction("AR camera rotation", InputActionType.Value, "<XRHMD>/centerEyeRotation");
-            positionAction.Enable();
-            rotationAction.Enable();
-            poseDriver.positionInput = new InputActionProperty(positionAction);
-            poseDriver.rotationInput = new InputActionProperty(rotationAction);
+            _positionAction = new InputAction("AR camera position", InputActionType.Value, "<XRHMD>/centerEyePosition");
+            _rotationAction = new InputAction("AR camera rotation", InputActionType.Value, "<XRHMD>/centerEyeRotation");
+            _positionAction.Enable();
+            _rotationAction.Enable();
+            poseDriver.positionInput = new InputActionProperty(_positionAction);
+            poseDriver.rotationInput = new InputActionProperty(_rotationAction);
             cameraObject.AddComponent<ARCameraManager>();
             cameraObject.AddComponent<ARCameraBackground>();
             origin.CameraFloorOffsetObject = offset;
@@ -129,8 +131,13 @@ namespace Aiva.GraceAR
 
         private void OnDestroy()
         {
-            _replies.TextArrived -= AnimateReply;
-            _replies.ReplyInterrupted -= StopReplyAnimation;
+            if (_replies != null)
+            {
+                _replies.TextArrived -= AnimateReply;
+                _replies.ReplyInterrupted -= StopReplyAnimation;
+            }
+            _positionAction?.Dispose();
+            _rotationAction?.Dispose();
             if (EnhancedTouchSupport.enabled) EnhancedTouchSupport.Disable();
         }
 
@@ -153,7 +160,7 @@ namespace Aiva.GraceAR
             }
 
             _placing = true;
-            _status = "Anchoring Grace’s chamber…";
+            _status = "Anchoring AIVA’s chamber…";
             try
             {
                 var result = await _anchorManager.TryAddAnchorAsync(pose);
@@ -171,7 +178,7 @@ namespace Aiva.GraceAR
                 _chamber.gameObject.SetActive(true);
                 if (previous != null && !_anchorManager.TryRemoveAnchor(previous))
                     Destroy(previous.gameObject);
-                _status = "Grace’s chamber is anchored here for this AR session.";
+                _status = "AIVA’s chamber is anchored here for this AR session.";
                 _planeManager.enabled = false;
             }
             catch (System.Exception error)
@@ -179,7 +186,7 @@ namespace Aiva.GraceAR
                 if (this != null)
                 {
                     _status = "Could not anchor the chamber. Tap a detected floor point again.";
-                    Debug.LogWarning($"Grace AR anchor placement failed: {error.Message}");
+                    Debug.LogWarning($"AIVA AR anchor placement failed: {error.Message}");
                 }
             }
             finally

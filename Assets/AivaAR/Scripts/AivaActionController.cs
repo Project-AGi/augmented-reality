@@ -1,9 +1,9 @@
 using System.Collections;
 using UnityEngine;
 
-namespace Aiva.GraceAR
+namespace Aiva.AivaAR
 {
-    public sealed class GraceActionController : MonoBehaviour
+    public sealed class AivaActionController : MonoBehaviour
     {
         private Transform _model;
         private Animator _animator;
