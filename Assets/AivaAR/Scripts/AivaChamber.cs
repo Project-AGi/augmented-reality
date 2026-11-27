@@ -1,16 +1,16 @@
 using UnityEngine;
 
-namespace Aiva.GraceAR
+namespace Aiva.AivaAR
 {
-    public sealed class GraceChamber : MonoBehaviour
+    public sealed class AivaChamber : MonoBehaviour
     {
         public Transform ModelMount { get; private set; }
-        public GraceActionController Actions { get; private set; }
+        public AivaActionController Actions { get; private set; }
 
-        public static GraceChamber Create()
+        public static AivaChamber Create()
         {
-            var root = new GameObject("Grace Chamber");
-            var chamber = root.AddComponent<GraceChamber>();
+            var root = new GameObject("AIVA Chamber");
+            var chamber = root.AddComponent<AivaChamber>();
             chamber.Build();
             return chamber;
         }
@@ -29,12 +29,12 @@ namespace Aiva.GraceAR
             CreateCylinder("Base Glow", transform, new Vector3(0f, 0.18f, 0f), new Vector3(0.70f, 0.018f, 0.70f), cyan);
             CreateCylinder("Top Glow", transform, new Vector3(0f, 2.02f, 0f), new Vector3(0.70f, 0.018f, 0.70f), cyan);
 
-            ModelMount = new GameObject("Grace Model Mount").transform;
+            ModelMount = new GameObject("AIVA Model Mount").transform;
             ModelMount.SetParent(transform, false);
             ModelMount.localPosition = new Vector3(0f, 0.22f, 0f);
             ModelMount.localScale = Vector3.one * 0.92f;
 
-            Actions = gameObject.AddComponent<GraceActionController>();
+            Actions = gameObject.AddComponent<AivaActionController>();
             AddBubbles();
         }
 

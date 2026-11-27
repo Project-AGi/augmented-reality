@@ -7,9 +7,9 @@ using UnityEngine;
 using UnityEngine.Networking;
 using VRM;
 
-namespace Aiva.GraceAR
+namespace Aiva.AivaAR
 {
-    public sealed class GraceVrmLoader : MonoBehaviour
+    public sealed class AivaVrmLoader : MonoBehaviour
     {
         private RuntimeGltfInstance _instance;
 
@@ -23,13 +23,13 @@ namespace Aiva.GraceAR
 
         private IEnumerator DownloadAndLoad(Transform parent)
         {
-            var path = Path.Combine(Application.streamingAssetsPath, "Grace.vrm");
+            var path = Path.Combine(Application.streamingAssetsPath, "AIVA.vrm");
             using var request = UnityWebRequest.Get(path);
             yield return request.SendWebRequest();
 
             if (request.result != UnityWebRequest.Result.Success)
             {
-                Failed?.Invoke($"Could not load Grace.vrm: {request.error}");
+                Failed?.Invoke($"Could not load AIVA.vrm: {request.error}");
                 yield break;
             }
 
@@ -48,7 +48,7 @@ namespace Aiva.GraceAR
         private async Task LoadBytes(Transform parent, byte[] bytes)
         {
             var instance = await VrmUtility.LoadBytesAsync(
-                "Grace.vrm",
+                "AIVA.vrm",
                 bytes,
                 new RuntimeOnlyAwaitCaller());
 

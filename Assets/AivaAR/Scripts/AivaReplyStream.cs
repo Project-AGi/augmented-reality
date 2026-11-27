@@ -6,13 +6,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Aiva.GraceAR
+namespace Aiva.AivaAR
 {
     // Mirrors the same text response topic that the Telepathy WebUI subscribes to.
-    public sealed class GraceReplyStream : MonoBehaviour
+    public sealed class AivaReplyStream : MonoBehaviour
     {
         private const string Topic = "/telepathic/response";
-        private const string SubscriptionId = "grace-ar-replies";
+        private const string SubscriptionId = "aiva-ar-replies";
         // The shared reply stream can include Canvas PNG events as well as text.
         private const int MaxMessageBytes = 12 * 1024 * 1024;
         private CancellationTokenSource _connection;
@@ -20,7 +20,7 @@ namespace Aiva.GraceAR
         public event Action TextArrived;
         public event Action ReplyInterrupted;
         public bool Active => _connection != null;
-        public string Status { get; private set; } = "Connect to mirror Grace’s replies.";
+        public string Status { get; private set; } = "Connect to mirror AIVA’s replies.";
 
         public async void Connect(string address)
         {
@@ -56,7 +56,7 @@ namespace Aiva.GraceAR
                 var subscribe = Encoding.UTF8.GetBytes(
                     "{\"op\":\"subscribe\",\"id\":\"" + SubscriptionId + "\",\"topic\":\"" + Topic + "\",\"type\":\"std_msgs/msg/String\"}");
                 await socket.SendAsync(new ArraySegment<byte>(subscribe), WebSocketMessageType.Text, true, connection.Token);
-                Status = "Listening for Grace’s WebUI replies.";
+                Status = "Listening for AIVA’s WebUI replies.";
                 await Listen(socket, connection.Token);
                 Status = connection.IsCancellationRequested ? "Disconnected." : "Telepathy closed the connection.";
             }
